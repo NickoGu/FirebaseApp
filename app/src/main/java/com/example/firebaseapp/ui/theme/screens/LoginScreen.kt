@@ -76,7 +76,7 @@ fun LoginScreen(
                     viewModel.login(
                         emailState.value,
                         passwordState.value,
-                        { navController.navigate(route = "homeScreen") },
+                        { navController.navigate(route = "fireStore") },
                         context = context,
                     )
                 },
