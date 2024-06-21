@@ -4,8 +4,8 @@ import MessageViewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -20,14 +20,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import coil.compose.AsyncImage
 
 @Composable
-fun FirestoreScreen() {
+fun FirestoreScreen(navController: NavController) {
     val viewModel: MessageViewModel = viewModel()
 
     var messageText by remember { mutableStateOf("") }
@@ -48,13 +52,23 @@ fun FirestoreScreen() {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(Icons.Rounded.AccountCircle, contentDescription = "Icon")
+                    AsyncImage(
+                        model = message.userImage,
+                        contentDescription = null,
+                        modifier =
+                            Modifier
+                                .padding(4.dp)
+                                .height(50.dp)
+                                .width(50.dp)
+                                .clip(shape = RoundedCornerShape(100)),
+                        contentScale = ContentScale.Crop,
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
                     Column(
                         modifier = Modifier.padding(vertical = 8.dp),
                     ) {
                         Text(
-                            text = message.userName,
+                            text = message.userName + " (${viewModel.userMail})",
                             fontWeight = FontWeight.Bold,
                             fontSize = 12.sp,
                         )
