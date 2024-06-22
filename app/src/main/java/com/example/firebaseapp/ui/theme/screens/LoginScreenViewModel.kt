@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
@@ -21,16 +22,21 @@ class LoginScreenViewModel : ViewModel() {
         context: Context,
     ) = viewModelScope.launch {
         _loading.value = true
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                _loading.value = false
-                if (task.isSuccessful) {
-                    function()
-                } else {
-                    Toast.makeText(context, "Email o contraseña incorrectos", Toast.LENGTH_SHORT).show()
-                    println("Email o contraseña incorrectos")
+        try {
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    _loading.value = false
+                    if (task.isSuccessful) {
+                        function()
+                    }
                 }
-            }
+        } catch (e: Exception) {
+            Firebase.crashlytics.log("Credenciales Inválidas en LoginScreen")
+            Toast.makeText(context, "Enviando Error a Firebase", Toast.LENGTH_SHORT).show()
+            Firebase.crashlytics.recordException(e)
+        } finally {
+            Toast.makeText(context, "Credenciales Invalidas", Toast.LENGTH_SHORT).show()
+        }
     }
 
     fun createAccount(
