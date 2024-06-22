@@ -73,9 +73,17 @@ fun SignupScreen(
             )
             Button(
                 onClick = {
-                    viewModel.createAccount(emailState.value, passwordState.value, {
-                        Toast.makeText(context, "Cuenta creada con éxito", Toast.LENGTH_SHORT).show()
-                    }, context = context)
+                    viewModel.createAccount(
+                        emailState.value,
+                        passwordState.value,
+                        "UnlamAnónimo",
+                        @Suppress("ktlint:standard:max-line-length")
+                        "https://seeklogo.com/images/U/unlam-universidad-nacional-de-la-matanza-logo-B665E562AA-seeklogo.com.png",
+                        {
+                            Toast.makeText(context, "Cuenta creada con éxito", Toast.LENGTH_SHORT).show()
+                        },
+                        context = context,
+                    )
                 },
                 modifier =
                     Modifier

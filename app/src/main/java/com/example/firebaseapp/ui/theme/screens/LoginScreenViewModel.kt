@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
@@ -42,6 +43,8 @@ class LoginScreenViewModel : ViewModel() {
     fun createAccount(
         email: String,
         password: String,
+        name: String,
+        imageUrl: String,
         function: () -> Unit,
         context: Context,
     ) = viewModelScope.launch {
@@ -50,7 +53,26 @@ class LoginScreenViewModel : ViewModel() {
             .addOnCompleteListener { task ->
                 _loading.value = false
                 if (task.isSuccessful) {
-                    function()
+                    val userId = auth.currentUser?.uid
+                    if (userId != null) {
+                        val user =
+                            hashMapOf(
+                                "name" to name,
+                                "imageUrl" to imageUrl,
+                                "userId" to userId,
+                            )
+                        Firebase.firestore.collection("users")
+                            .document(userId)
+                            .set(user)
+                            .addOnSuccessListener {
+                                function()
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(context, "Error al agregar usuario: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                    } else {
+                        Toast.makeText(context, "No se pudo obtener el userId", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
                     Toast.makeText(context, "No se pudo crear la cuenta", Toast.LENGTH_SHORT).show()
                 }

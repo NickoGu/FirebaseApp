@@ -8,7 +8,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.firebaseapp.ui.theme.screens.FirestoreScreen
 import com.example.firebaseapp.ui.theme.screens.HomeScreen
+import com.example.firebaseapp.ui.theme.screens.ProfileScreen
 
 @Composable
 fun AppNavigation() {
@@ -22,6 +24,12 @@ fun AppNavigation() {
         }
         composable(route = "homeScreen") {
             HomeScreen()
+        }
+        composable(route = "fireStore") {
+            FirestoreScreen(navController = navController)
+        }
+        composable(route = "editUser") {
+            ProfileScreen(navController = navController)
         }
     }
 }
