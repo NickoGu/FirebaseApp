@@ -17,6 +17,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.firebaseapp.ui.theme.screens.LoginScreenViewModel
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun LoginScreen(
@@ -84,14 +86,34 @@ fun LoginScreen(
                     Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0XFF3483FA), contentColor = Color.White),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = Color(0XFF3483FA),
+                        contentColor = Color.White,
+                    ),
             ) {
                 Text("Iniciar sesión")
             }
             Row {
                 Text(text = "¿No tenés una cuenta?")
                 Spacer(modifier = Modifier.width(4.dp))
-                Text(text = "¡Registrate acá!", modifier = Modifier.clickable { navController.navigate(route = "signUp") })
+                Text(
+                    text = "¡Registrate acá!",
+                    modifier = Modifier.clickable { navController.navigate(route = "signUp") },
+                )
+            }
+            Button(
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = Color(0Xeeff3300),
+                    ),
+                modifier = Modifier.padding(top = 100.dp),
+                onClick = {
+                    Firebase.crashlytics.log("Boton Para Crash Presionado")
+                    throw RuntimeException("This is a test crash")
+                },
+            ) {
+                Text("Botón Bomba")
             }
         }
     }
