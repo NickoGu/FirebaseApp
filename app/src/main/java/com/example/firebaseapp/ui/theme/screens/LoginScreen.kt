@@ -1,3 +1,4 @@
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -8,8 +9,10 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,6 +22,7 @@ import androidx.navigation.NavController
 import com.example.firebaseapp.ui.theme.screens.LoginScreenViewModel
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.ktx.remoteConfig
 
 @Composable
 fun LoginScreen(
@@ -27,21 +31,43 @@ fun LoginScreen(
     navController: NavController,
 ) {
     val context = LocalContext.current
+
+    val remoteConfig = Firebase.remoteConfig
+
+    // Variables de estado para los valores de Remote Config
+    var welcomeMessage by remember { mutableStateOf(remoteConfig.getString("textConfig")) }
+    var themeDateTime by remember { mutableStateOf(remoteConfig.getBoolean("booleanConfig")) }
+
+    // Fetch de Remote Config
+    remoteConfig.fetchAndActivate()
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                welcomeMessage = remoteConfig.getString("textConfig")
+                themeDateTime = remoteConfig.getBoolean("booleanConfig")
+            }
+        }
+
     Surface(modifier = Modifier.fillMaxSize()) {
         val emailState = remember { mutableStateOf("") }
         val passwordState = remember { mutableStateOf("") }
         Column(
             modifier =
                 Modifier
-                    .padding(padding)
-                    .fillMaxSize(),
+                    .fillMaxSize().background(if (themeDateTime) Color.DarkGray else Color.White),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
+                text = welcomeMessage,
+                modifier = Modifier.padding(bottom = 24.dp),
+                style = MaterialTheme.typography.bodyLarge,
+                color = (if (themeDateTime) Color.White else Color.DarkGray),
+            )
+            Text(
                 text = "Iniciar sesión",
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(bottom = 16.dp),
+                color = (if (themeDateTime) Color.White else Color.DarkGray),
             )
 
             OutlinedTextField(
@@ -51,6 +77,16 @@ fun LoginScreen(
                 colors =
                     OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0XFF3483FA),
+                        disabledTextColor = if (themeDateTime) Color.White else Color.DarkGray,
+                        unfocusedTextColor = if (themeDateTime) Color.White else Color.DarkGray,
+                        focusedTextColor = if (themeDateTime) Color.White else Color.DarkGray,
+                        focusedSupportingTextColor = if (themeDateTime) Color.White else Color.DarkGray,
+                        disabledSupportingTextColor = if (themeDateTime) Color.White else Color.DarkGray,
+                        unfocusedPlaceholderColor = if (themeDateTime) Color.White else Color.DarkGray,
+                        disabledPlaceholderColor = if (themeDateTime) Color.White else Color.DarkGray,
+                        focusedPlaceholderColor = if (themeDateTime) Color.White else Color.DarkGray,
+                        focusedLabelColor = if (themeDateTime) Color.White else Color.DarkGray,
+                        unfocusedLabelColor = if (themeDateTime) Color.White else Color.DarkGray,
                     ),
                 modifier =
                     Modifier
@@ -66,6 +102,16 @@ fun LoginScreen(
                 colors =
                     OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0XFF3483FA),
+                        disabledTextColor = if (themeDateTime) Color.White else Color.DarkGray,
+                        unfocusedTextColor = if (themeDateTime) Color.White else Color.DarkGray,
+                        focusedTextColor = if (themeDateTime) Color.White else Color.DarkGray,
+                        focusedSupportingTextColor = if (themeDateTime) Color.White else Color.DarkGray,
+                        disabledSupportingTextColor = if (themeDateTime) Color.White else Color.DarkGray,
+                        unfocusedPlaceholderColor = if (themeDateTime) Color.White else Color.DarkGray,
+                        disabledPlaceholderColor = if (themeDateTime) Color.White else Color.DarkGray,
+                        focusedPlaceholderColor = if (themeDateTime) Color.White else Color.DarkGray,
+                        focusedLabelColor = if (themeDateTime) Color.White else Color.DarkGray,
+                        unfocusedLabelColor = if (themeDateTime) Color.White else Color.DarkGray,
                     ),
                 modifier =
                     Modifier
@@ -95,10 +141,11 @@ fun LoginScreen(
                 Text("Iniciar sesión")
             }
             Row {
-                Text(text = "¿No tenés una cuenta?")
+                Text(text = "¿No tenés una cuenta?", color = (if (themeDateTime) Color.White else Color.DarkGray))
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "¡Registrate acá!",
+                    color = (if (themeDateTime) Color.White else Color.DarkGray),
                     modifier = Modifier.clickable { navController.navigate(route = "signUp") },
                 )
             }
