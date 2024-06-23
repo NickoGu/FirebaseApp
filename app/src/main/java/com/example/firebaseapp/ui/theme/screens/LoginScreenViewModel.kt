@@ -36,7 +36,7 @@ class LoginScreenViewModel : ViewModel() {
             Toast.makeText(context, "Enviando Error a Firebase", Toast.LENGTH_SHORT).show()
             Firebase.crashlytics.recordException(e)
         } finally {
-            Toast.makeText(context, "Credenciales Invalidas", Toast.LENGTH_SHORT).show()
+            //
         }
     }
 

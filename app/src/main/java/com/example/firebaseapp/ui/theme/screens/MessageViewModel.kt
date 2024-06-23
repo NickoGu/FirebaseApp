@@ -12,11 +12,11 @@ class MessageViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private val currentUser = auth.currentUser
-
+    val userId = auth.currentUser?.uid
     private val _messageList = MutableLiveData<List<Message>>()
     val messageList: LiveData<List<Message>>
         get() = _messageList
-    val userMail = currentUser?.email
+
 
     init {
         loadMessages()
@@ -39,7 +39,8 @@ class MessageViewModel : ViewModel() {
                                 "imageUrl",
                             ) ?: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTugu0kegXOT1Gh1sgDVHvYjkGW29w19Hl9gQ&s"
 
-                        val message = Message(userName, messageContent, timestamp.seconds, userImage)
+                        val message = Message(userName, messageContent, timestamp.seconds,
+                            userImage, userId!!)
 
                         firestore.collection("messages")
                             .add(message)
@@ -78,7 +79,7 @@ class MessageViewModel : ViewModel() {
                     val timestamp = document.getLong("timestamp") ?: 0
                     val userImage = document.getString("userImage") ?: ""
 
-                    val message = Message(userName, messageContent, timestamp, userImage)
+                    val message = Message(userName, messageContent, timestamp, userImage, userId!!)
                     messages.add(message)
                 }
                 _messageList.value = messages
@@ -91,4 +92,5 @@ data class Message(
     val messageContent: String,
     val timestamp: Long,
     val userImage: String,
+    val userId : String,
 )

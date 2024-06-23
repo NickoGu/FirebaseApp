@@ -1,6 +1,8 @@
 package com.example.firebaseapp.ui.theme.screens
 
 import MessageViewModel
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -11,7 +13,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -50,17 +55,17 @@ fun FirestoreScreen(navController: NavController) {
         ) {
             itemsIndexed(sortedMessages.reversed()) { index, message ->
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
+
                 ) {
                     AsyncImage(
                         model = message.userImage,
                         contentDescription = null,
                         modifier =
-                            Modifier
-                                .padding(4.dp)
-                                .height(50.dp)
-                                .width(50.dp)
-                                .clip(shape = RoundedCornerShape(100)),
+                        Modifier
+                            .padding(4.dp)
+                            .height(50.dp)
+                            .width(50.dp)
+                            .clip(shape = RoundedCornerShape(100)),
                         contentScale = ContentScale.Crop,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -68,7 +73,7 @@ fun FirestoreScreen(navController: NavController) {
                         modifier = Modifier.padding(vertical = 8.dp),
                     ) {
                         Text(
-                            text = message.userName + " (${viewModel.userMail})",
+                            text = message.userName,
                             fontWeight = FontWeight.Bold,
                             fontSize = 12.sp,
                         )
@@ -81,29 +86,38 @@ fun FirestoreScreen(navController: NavController) {
                 }
             }
         }
-        Row(
-            modifier =
-                Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            OutlinedTextField(
-                value = messageText,
-                onValueChange = { messageText = it },
-                label = { Text(text = "Escribir mensaje") },
-                singleLine = true,
-                modifier = Modifier.weight(1f),
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Button(
-                onClick = {
-                    viewModel.newMessage(messageText)
-                    messageText = ""
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0XFF3483FA)),
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(Icons.Rounded.Send, contentDescription = "")
-            }
+                OutlinedTextField(
+                    value = messageText,
+                    onValueChange = { messageText = it },
+                    placeholder = { Text(text = if (messageText.isEmpty()) "Escribir mensaje..." else "") },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f),
+                    trailingIcon = {
+                        Icon(Icons.Rounded.Send, contentDescription = "", Modifier.clickable { viewModel.newMessage(messageText)
+                            messageText = "" })
+                    },
+                    shape = RoundedCornerShape(64.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.Transparent,
+                            unfocusedBorderColor = Color.Transparent,
+                            cursorColor = Color.White,
+                            focusedLabelColor = Color.White,
+                            focusedContainerColor = Color(0xFF3d4354),
+                            unfocusedContainerColor = Color(0xFF3d4354)
+                    )
+
+                )
+
         }
         Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
     }
 }
+
