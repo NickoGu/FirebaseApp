@@ -1,5 +1,6 @@
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -46,10 +47,11 @@ fun SignupScreen(
                 value = emailState.value,
                 onValueChange = { emailState.value = it },
                 label = { Text("Correo electrónico") },
+                shape = RoundedCornerShape(64.dp),
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
                 textStyle = MaterialTheme.typography.bodyMedium,
                 colors =
                     OutlinedTextFieldDefaults.colors(
@@ -61,10 +63,11 @@ fun SignupScreen(
                 value = passwordState.value,
                 onValueChange = { passwordState.value = it },
                 label = { Text("Contraseña") },
+                shape = RoundedCornerShape(64.dp),
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
                 textStyle = MaterialTheme.typography.bodyMedium,
                 colors =
                     OutlinedTextFieldDefaults.colors(

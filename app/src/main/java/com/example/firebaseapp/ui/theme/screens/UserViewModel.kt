@@ -10,44 +10,70 @@ import com.google.firebase.storage.ktx.storage
 class UserViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
+    private val storage = Firebase.storage
     private val currentUser = auth.currentUser
-    val storage = Firebase.storage
+
+    // Modelo de datos del usuario
+    var userInfo = User("", "", "")
+
+    init {
+        loadUserData()
+    }
 
     fun uploadImage(imageUri: Uri) {
         val userId = auth.currentUser?.uid ?: return
-
-        // Referencia a la imagen en Storage
         val storageRef = storage.reference.child("profileImages/$userId.jpg")
 
-        // Subir imagen a Firebase Storage
-        storageRef.putFile(imageUri)
+        storageRef
+            .putFile(imageUri)
             .addOnSuccessListener {
-                // Obtener la URL de descarga de la imagen
                 storageRef.downloadUrl.addOnSuccessListener { uri ->
-                    // Actualizar el campo de la imagen en Firestore
-                    firestore.collection("users").document(userId)
+                    // Actualizar la URL de la imagen en Firestore
+                    firestore
+                        .collection("users")
+                        .document(userId)
                         .update("imageUrl", uri.toString())
-                        .addOnSuccessListener {
-                            // Éxito al actualizar la imagen del usuario
-                            // Puedes mostrar un mensaje de éxito o actualizar el estado en el ViewModel
-                        }
                         .addOnFailureListener { exception ->
                             // Manejar errores de Firestore
+                            println("Error updating image URL: $exception")
                         }
                 }
+            }.addOnFailureListener { exception ->
+                // Manejar errores de Firebase Storage
+                println("Error uploading image: $exception")
+            }
+    }
+
+    fun loadUserData() {
+        val userId = auth.currentUser?.uid ?: return
+        firestore
+            .collection("users")
+            .document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val userName = document.getString("name") ?: ""
+                    val imageUrl = document.getString("imageUrl") ?: ""
+                    userInfo = User(userName, imageUrl, userId)
+                } else {
+                    // Documento no encontrado o no existe
+                    println("Document not found")
+                }
+            }.addOnFailureListener { exception ->
+                // Manejar errores de Firestore
+                println("Error fetching user data: $exception")
             }
     }
 
     fun updateName(newName: String) {
         val userId = auth.currentUser?.uid ?: return
-        firestore.collection("users").document(userId)
+        firestore
+            .collection("users")
+            .document(userId)
             .update("name", newName)
-            .addOnSuccessListener {
-                // Éxito al actualizar la imagen del usuario
-                // Puedes mostrar un mensaje de éxito o actualizar el estado en el ViewModel
-            }
             .addOnFailureListener { exception ->
                 // Manejar errores de Firestore
+                println("Error updating name: $exception")
             }
     }
 }

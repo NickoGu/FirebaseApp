@@ -1,6 +1,7 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -39,7 +40,8 @@ fun LoginScreen(
     var themeDateTime by remember { mutableStateOf(remoteConfig.getBoolean("booleanConfig")) }
 
     // Fetch de Remote Config
-    remoteConfig.fetchAndActivate()
+    remoteConfig
+        .fetchAndActivate()
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 welcomeMessage = remoteConfig.getString("textConfig")
@@ -53,7 +55,8 @@ fun LoginScreen(
         Column(
             modifier =
                 Modifier
-                    .fillMaxSize().background(if (themeDateTime) Color.DarkGray else Color.White),
+                    .fillMaxSize()
+                    .background(if (themeDateTime) Color.DarkGray else Color.White),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -74,6 +77,7 @@ fun LoginScreen(
                 value = emailState.value,
                 onValueChange = { emailState.value = it },
                 label = { Text("Correo electrónico") },
+                shape = RoundedCornerShape(64.dp),
                 colors =
                     OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0XFF3483FA),
@@ -91,7 +95,7 @@ fun LoginScreen(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
                 textStyle = MaterialTheme.typography.bodyMedium,
             )
 
@@ -99,6 +103,7 @@ fun LoginScreen(
                 value = passwordState.value,
                 onValueChange = { passwordState.value = it },
                 label = { Text("Contraseña") },
+                shape = RoundedCornerShape(64.dp),
                 colors =
                     OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0XFF3483FA),
@@ -116,7 +121,7 @@ fun LoginScreen(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
                 textStyle = MaterialTheme.typography.bodyMedium,
             )
             Button(
