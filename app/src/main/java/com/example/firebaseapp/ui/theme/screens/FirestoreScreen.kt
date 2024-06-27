@@ -1,7 +1,6 @@
 package com.example.firebaseapp.ui.theme.screens
 
 import MessageViewModel
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,14 +8,10 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Send
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -28,22 +23,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.logEvent
 
 @Composable
 fun FirestoreScreen(navController: NavController) {
     val viewModel: MessageViewModel = viewModel()
 
     var messageText by remember { mutableStateOf("") }
-
+    val context = LocalContext.current
     val messageList by viewModel.messageList.observeAsState(initial = emptyList())
     val sortedMessages = messageList.sortedBy { it.timestamp }
-
+    val firebaseAnalytics = FirebaseAnalytics.getInstance(context)
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -54,18 +52,16 @@ fun FirestoreScreen(navController: NavController) {
             reverseLayout = true,
         ) {
             itemsIndexed(sortedMessages.reversed()) { index, message ->
-                Row(
-
-                ) {
+                Row {
                     AsyncImage(
                         model = message.userImage,
                         contentDescription = null,
                         modifier =
-                        Modifier
-                            .padding(4.dp)
-                            .height(50.dp)
-                            .width(50.dp)
-                            .clip(shape = RoundedCornerShape(100)),
+                            Modifier
+                                .padding(4.dp)
+                                .height(50.dp)
+                                .width(50.dp)
+                                .clip(shape = RoundedCornerShape(100)),
                         contentScale = ContentScale.Crop,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -87,37 +83,45 @@ fun FirestoreScreen(navController: NavController) {
             }
         }
 
-            Row(
-                modifier = Modifier
+        Row(
+            modifier =
+                Modifier
                     .fillMaxWidth()
                     .height(100.dp)
                     .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                OutlinedTextField(
-                    value = messageText,
-                    onValueChange = { messageText = it },
-                    placeholder = { Text(text = if (messageText.isEmpty()) "Escribir mensaje..." else "") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f),
-                    trailingIcon = {
-                        Icon(Icons.Rounded.Send, contentDescription = "", Modifier.clickable { viewModel.newMessage(messageText)
-                            messageText = "" })
-                    },
-                    shape = RoundedCornerShape(64.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color.Transparent,
-                            unfocusedBorderColor = Color.Transparent,
-                            cursorColor = Color.White,
-                            focusedLabelColor = Color.White,
-                            focusedContainerColor = Color(0xFF3d4354),
-                            unfocusedContainerColor = Color(0xFF3d4354)
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            OutlinedTextField(
+                value = messageText,
+                onValueChange = { messageText = it },
+                placeholder = { Text(text = if (messageText.isEmpty()) "Escribir mensaje..." else "") },
+                singleLine = true,
+                modifier = Modifier.weight(1f),
+                trailingIcon = {
+                    Icon(
+                        Icons.Rounded.Send,
+                        contentDescription = "",
+                        Modifier.clickable {
+                            firebaseAnalytics.logEvent("message") {
+                                param("message", messageText)
+                            }
+                            viewModel.newMessage(messageText)
+                            messageText = ""
+                        },
                     )
-
-                )
-
+                },
+                shape = RoundedCornerShape(64.dp),
+                colors =
+                    OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Transparent,
+                        unfocusedBorderColor = Color.Transparent,
+                        cursorColor = Color.White,
+                        focusedLabelColor = Color.White,
+                        focusedContainerColor = Color(0xFF3d4354),
+                        unfocusedContainerColor = Color(0xFF3d4354),
+                    ),
+            )
         }
         Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
     }
 }
-

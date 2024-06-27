@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("com.google.firebase.firebase-perf")
 }
 
 android {
@@ -66,6 +67,7 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
     implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("com.google.firebase:firebase-perf")
     implementation("com.google.firebase:firebase-config-ktx")
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation(libs.firebase.auth.ktx)

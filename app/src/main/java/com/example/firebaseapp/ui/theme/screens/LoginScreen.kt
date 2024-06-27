@@ -21,6 +21,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.firebaseapp.ui.theme.screens.LoginScreenViewModel
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.logEvent
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
@@ -32,7 +34,7 @@ fun LoginScreen(
     navController: NavController,
 ) {
     val context = LocalContext.current
-
+    val firebaseAnalytics = FirebaseAnalytics.getInstance(context)
     val remoteConfig = Firebase.remoteConfig
 
     // Variables de estado para los valores de Remote Config
@@ -129,7 +131,13 @@ fun LoginScreen(
                     viewModel.login(
                         emailState.value,
                         passwordState.value,
-                        { navController.navigate(route = "editUser") },
+                        {
+                            firebaseAnalytics.logEvent("login") {
+                                param("email", emailState.value)
+                                param("password", passwordState.value)
+                            }
+                            navController.navigate(route = "editUser")
+                        },
                         context = context,
                     )
                 },
